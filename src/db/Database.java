@@ -1,5 +1,6 @@
 package db;
 import java.util.ArrayList;
+import db.exception.*;
 
 public class Database {
 
@@ -33,7 +34,7 @@ public class Database {
         throw new EntityNotFoundException();
     }
 
-    public static void update(Entity e) {
+    public static void update(Entity newEntity) {
         for (int i = 0; i < entities.size(); i++) {
             if (entities.get(i).id == newEntity.id) {
                 entities.set(i, newEntity);
