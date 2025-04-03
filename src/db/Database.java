@@ -7,7 +7,7 @@ public class Database {
 
     protected static int nextID = 1;
     private static ArrayList<Entity> entities = new ArrayList<>();
-    private static HashMap<Integer, Validator> validators;
+    private static HashMap<Integer, Validator> validators = new HashMap<>();
 
     private Database() {}
 
