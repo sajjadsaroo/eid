@@ -24,9 +24,9 @@ public class Database {
     }
 
     public static void delete(int id) {
-        for (Entity e : entities) {
-            if (e.id == id) {
-                entities.remove(e);
+        for (int i = 0; i < entities.size(); i++) {
+            if (entities.get(i).id == id) {
+                entities.remove(i);
                 return;
             }
         }
