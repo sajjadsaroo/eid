@@ -1,6 +1,7 @@
 package db;
 
 import java.util.*;
+
 import db.exception.*;
 
 public class Database {
@@ -9,7 +10,8 @@ public class Database {
     private static ArrayList<Entity> entities = new ArrayList<>();
     private static HashMap<Integer, Validator> validators = new HashMap<>();
 
-    private Database() {}
+    private Database() {
+    }
 
     private static int findEntityIndexById(int id) {
         for (int i = 0; i < entities.size(); i++) {
@@ -34,8 +36,17 @@ public class Database {
 
 
     public static void add(Entity entity) throws InvalidEntityException {
-        validateEntity(entity);
+        Validator validator = validators.get(entity.getEntityCode());
+        if (validator != null)
+            validateEntity(entity);
         entity.id = nextID++;
+
+        if (entity instanceof Trackable trackableEntity) {
+            Date now = new Date();
+            trackableEntity.setCreationDate(now);
+            trackableEntity.setLastModificationDate(now);
+        }
+
         entities.add(entity.copy());
     }
 
@@ -61,8 +72,16 @@ public class Database {
 
     public static void update(Entity entity) throws InvalidEntityException {
 
-        validateEntity(entity);
+        Validator validator = validators.get(entity.getEntityCode());
+        if (validator != null)
+            validateEntity(entity);
+
         int index = findEntityIndexById(entity.id);
+
+        if (entity instanceof Trackable trackableEntity) {
+            trackableEntity.setLastModificationDate(new Date());
+        }
+
         entities.set(index, entity.copy());
 
     }
