@@ -93,7 +93,7 @@ public class Database {
     }
 
     public static void registerSerializer(int entityCode, Serializer serializer) {
-        if (validators.containsKey(entityCode))
+        if (serializers.containsKey(entityCode))
             throw new IllegalArgumentException("Serializer for this entity code already exists.");
 
         serializers.put(entityCode, serializer);
