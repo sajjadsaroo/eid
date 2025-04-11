@@ -12,13 +12,13 @@ public class TaskSerializer implements Serializer {
     @Override
     public String serialize(Entity e) {
         Task task = (Task) e;
-        return task.getEntityCode() + "|" + task.id + "|" + task.title + "|" + task.description + "|" +
-                new SimpleDateFormat("yyyy-MM-dd").format(task.dueDate) + "|" + task.status.name();
+        return task.getEntityCode() + "," + task.id + "," + task.title + "," + task.description + "," +
+                new SimpleDateFormat("yyyy-MM-dd").format(task.dueDate) + "," + task.status.name();
     }
 
     @Override
     public Entity deserialize(String s) {
-        String[] parts = s.split("\\|");
+        String[] parts = s.split(",");
         if (parts.length != 6) {
             throw new IllegalArgumentException("Invalid Task data format");
         }
