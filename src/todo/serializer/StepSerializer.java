@@ -9,12 +9,12 @@ public class StepSerializer implements Serializer {
     @Override
     public String serialize(Entity e) {
         Step step = (Step) e;
-        return step.getEntityCode() + "|" + step.id + "|" + step.title + "|" + step.status.name() + "|" + step.taskRef;
+        return step.getEntityCode() + "," + step.id + "," + step.title + "," + step.status.name() + "," + step.taskRef;
     }
 
     @Override
     public Entity deserialize(String s) {
-        String[] parts = s.split("\\|");
+        String[] parts = s.split(",");
         if (parts.length != 5) {
             throw new IllegalArgumentException("Invalid Step data format");
         }
