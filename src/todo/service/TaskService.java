@@ -5,15 +5,46 @@ import db.Entity;
 import db.exception.EntityNotFoundException;
 import db.exception.InvalidEntityException;
 import todo.entity.Task;
+import todo.entity.Step;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.Date;
 
-
 public class TaskService {
+
+    public static void createTask(String title, String description, Date dueDate) {
+        try {
+            Task task = new Task(title, description, dueDate);
+            Database.add(task);
+
+            System.out.println("Task saved successfully.");
+            System.out.println("ID: " + task.id);
+        } catch (InvalidEntityException e) {
+            System.out.println("Cannot save task.");
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public static void deleteTask(int taskId) {
+        try {
+            Database.delete(taskId);
+
+            ArrayList<Entity> allSteps = Database.getAll(Step.STEP_ENTITY_CODE);
+            for (Entity e : allSteps) {
+                Step step = (Step) e;
+                if (step.taskRef == taskId) {
+                    Database.delete(step.id);
+                }
+            }
+
+            System.out.println("Entity with ID=" + taskId + " successfully deleted.");
+        } catch (EntityNotFoundException e) {
+            System.out.println("Cannot delete entity with ID=" + taskId);
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 
     public static void changeStatus(int taskId, Task.Status newStatus) {
         try {
@@ -72,7 +103,12 @@ public class TaskService {
             } else if (field.equalsIgnoreCase("status")) {
                 oldValue = task.status.name();
                 try {
-                    task.status = Task.Status.valueOf(newValue);
+                    for (Task.Status s : Task.Status.values()) {
+                        if (s.name().equalsIgnoreCase(newValue)) {
+                            task.status = s;
+                            break;
+                        }
+                    }
                 } catch (IllegalArgumentException e) {
                     System.out.println("Invalid status value.");
                     return;
@@ -113,11 +149,11 @@ public class TaskService {
             System.out.println("Due Date: " + task.dueDate);
             System.out.println("Status: " + task.status);
 
-            ArrayList<Entity> allSteps = Database.getAll(todo.entity.Step.STEP_ENTITY_CODE);
+            ArrayList<Entity> allSteps = Database.getAll(Step.STEP_ENTITY_CODE);
             boolean hasSteps = false;
 
             for (Entity e : allSteps) {
-                todo.entity.Step step = (todo.entity.Step) e;
+                Step step = (Step) e;
                 if (step.taskRef == task.id) {
                     if (!hasSteps) {
                         System.out.println("Steps:");
@@ -158,9 +194,4 @@ public class TaskService {
             }
         }
     }
-
-
-
-
-
 }
