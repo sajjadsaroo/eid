@@ -18,6 +18,9 @@ public class StepService {
 
             System.out.println("Step saved successfully.");
             System.out.println("ID: " + step.id);
+
+            adjustTaskStatusAfterAddingStep(taskRef);
+
         } catch (InvalidEntityException e) {
             System.out.println("Cannot save step.");
             System.out.println("Error: " + e.getMessage());
@@ -97,6 +100,35 @@ public class StepService {
                 task.status = Task.Status.Completed;
                 Database.update(task);
             } else if (completed > 0 && task.status == Task.Status.NotStarted) {
+                task.status = Task.Status.InProgress;
+                Database.update(task);
+            }
+        } catch (Exception ignored) {}
+    }
+
+    private static void adjustTaskStatusAfterAddingStep(int taskId) {
+        try {
+            Entity entity = Database.get(taskId);
+            if (!(entity instanceof Task task)) return;
+
+            ArrayList<Entity> allSteps = Database.getAll(Step.STEP_ENTITY_CODE);
+            int completed = 0;
+            int total = 0;
+
+            for (Entity e : allSteps) {
+                Step step = (Step) e;
+                if (step.taskRef == taskId) {
+                    total++;
+                    if (step.status == Step.Status.Completed) completed++;
+                }
+            }
+
+            if (total == 0) return;
+
+            if (completed == 0 && task.status != Task.Status.NotStarted) {
+                task.status = Task.Status.NotStarted;
+                Database.update(task);
+            } else if (completed < total && task.status == Task.Status.Completed) {
                 task.status = Task.Status.InProgress;
                 Database.update(task);
             }
