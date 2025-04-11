@@ -10,8 +10,7 @@ public class Database {
     private static ArrayList<Entity> entities = new ArrayList<>();
     private static HashMap<Integer, Validator> validators = new HashMap<>();
 
-    private Database() {
-    }
+    private Database() {}
 
     private static int findEntityIndexById(int id) {
         for (int i = 0; i < entities.size(); i++) {
@@ -34,7 +33,6 @@ public class Database {
         validator.validate(entity);
     }
 
-
     public static void add(Entity entity) throws InvalidEntityException {
         Validator validator = validators.get(entity.getEntityCode());
         if (validator != null)
@@ -49,7 +47,6 @@ public class Database {
 
         entities.add(entity.copy());
     }
-
 
     public static Entity get(int id) {
         for (Entity entity : entities) {
@@ -71,7 +68,6 @@ public class Database {
     }
 
     public static void update(Entity entity) throws InvalidEntityException {
-
         Validator validator = validators.get(entity.getEntityCode());
         if (validator != null)
             validateEntity(entity);
@@ -83,9 +79,7 @@ public class Database {
         }
 
         entities.set(index, entity.copy());
-
     }
-
 
     public static void registerValidator(int entityCode, Validator validator) {
         if (validators.containsKey(entityCode))
@@ -94,5 +88,13 @@ public class Database {
         validators.put(entityCode, validator);
     }
 
-
+    public static ArrayList<Entity> getAll(int entityCode) {
+        ArrayList<Entity> result = new ArrayList<>();
+        for (Entity e : entities) {
+            if (e.getEntityCode() == entityCode) {
+                result.add(e.copy());
+            }
+        }
+        return result;
+    }
 }
