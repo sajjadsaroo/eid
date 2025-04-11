@@ -1,6 +1,8 @@
 package db;
 
 import java.util.*;
+import java.io.*;
+import java.util.List;
 
 import db.exception.*;
 
@@ -9,8 +11,10 @@ public class Database {
     protected static int nextID = 1;
     private static ArrayList<Entity> entities = new ArrayList<>();
     private static HashMap<Integer, Validator> validators = new HashMap<>();
+    private static HashMap<Integer, Serializer> serializers = new HashMap<>();
 
-    private Database() {}
+    private Database() {
+    }
 
     private static int findEntityIndexById(int id) {
         for (int i = 0; i < entities.size(); i++) {
@@ -87,6 +91,54 @@ public class Database {
 
         validators.put(entityCode, validator);
     }
+
+    public static void registerSerializer(int entityCode, Serializer serializer) {
+        if (validators.containsKey(entityCode))
+            throw new IllegalArgumentException("Serializer for this entity code already exists.");
+
+        serializers.put(entityCode, serializer);
+    }
+
+    public static void save() {
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter("db.txt"))) {
+            for (Entity entity : entities) {
+                Serializer serializer = serializers.get(entity.getEntityCode());
+                if (serializer != null) {
+                    String serializedEntity = serializer.serialize(entity);
+                    writer.write(serializedEntity);
+                    writer.newLine();
+                }
+            }
+            System.out.println("Database saved successfully.");
+        } catch (IOException e) {
+            System.out.println("Error saving database: " + e.getMessage());
+        }
+    }
+
+    public static void load() {
+        try (BufferedReader reader = new BufferedReader(new FileReader("db.txt"))) {
+            String line;
+            while ((line = reader.readLine()) != null) {
+                String[] parts = line.split("\\|", 2);
+                if (parts.length < 2) continue;
+
+                int entityCode = Integer.parseInt(parts[0]);
+                String serializedData = parts[1];
+
+                Serializer serializer = serializers.get(entityCode);
+                if (serializer != null) {
+                    Entity entity = serializer.deserialize(serializedData);
+                    add(entity);
+                }
+            }
+            System.out.println("Database loaded successfully.");
+        } catch (IOException e) {
+            System.out.println("Error loading database: " + e.getMessage());
+        } catch (InvalidEntityException e) {
+            System.out.println("invalid entity " + e.getMessage());
+        }
+    }
+
 
     public static ArrayList<Entity> getAll(int entityCode) {
         ArrayList<Entity> result = new ArrayList<>();
