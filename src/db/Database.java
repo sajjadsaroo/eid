@@ -100,7 +100,17 @@ public class Database {
     }
 
     public static void save() {
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter("db.txt"))) {
+        File file = new File("db.txt");
+        try {
+            if (!file.exists()) {
+                file.createNewFile();
+            }
+        } catch (IOException e) {
+            System.out.println("Error creating file: " + e.getMessage());
+            return;
+        }
+
+        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
             for (Entity entity : entities) {
                 Serializer serializer = serializers.get(entity.getEntityCode());
                 if (serializer != null) {
@@ -123,21 +133,30 @@ public class Database {
                 if (parts.length < 2) continue;
 
                 int entityCode = Integer.parseInt(parts[0]);
-                String serializedData = parts[1];
+                String serializedData = parts[1]; 
 
                 Serializer serializer = serializers.get(entityCode);
                 if (serializer != null) {
                     Entity entity = serializer.deserialize(serializedData);
-                    add(entity);
+                    if (entity != null) {
+                        add(entity);
+                        System.out.println("Loaded entity with ID: " + entity.id);
+                    } else {
+                        System.out.println("Failed to deserialize entity.");
+                    }
+                } else {
+                    System.out.println("No serializer found for entity code: " + entityCode);
                 }
             }
             System.out.println("Database loaded successfully.");
         } catch (IOException e) {
             System.out.println("Error loading database: " + e.getMessage());
         } catch (InvalidEntityException e) {
-            System.out.println("invalid entity " + e.getMessage());
+            System.out.println("Invalid entity: " + e.getMessage());
         }
     }
+
+
 
 
     public static ArrayList<Entity> getAll(int entityCode) {
