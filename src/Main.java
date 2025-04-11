@@ -43,8 +43,8 @@ public class Main {
         Database.registerValidator(Task.TASK_ENTITY_CODE, new TaskValidator());
         Database.registerValidator(Step.STEP_ENTITY_CODE, new StepValidator());
 
-        Database.registerSerializer(16, new TaskSerializer());
-        Database.registerSerializer(17, new StepSerializer());
+        Database.registerSerializer(Task.TASK_ENTITY_CODE, new TaskSerializer());
+        Database.registerSerializer(Step.STEP_ENTITY_CODE, new StepSerializer());
 
 
         Database.load();
