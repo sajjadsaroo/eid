@@ -129,11 +129,11 @@ public class Database {
         try (BufferedReader reader = new BufferedReader(new FileReader("db.txt"))) {
             String line;
             while ((line = reader.readLine()) != null) {
-                String[] parts = line.split("\\|", 2);
+                String[] parts = line.split(",", -1);
                 if (parts.length < 2) continue;
 
                 int entityCode = Integer.parseInt(parts[0]);
-                String serializedData = parts[1]; 
+                String serializedData = String.join(",", Arrays.copyOfRange(parts, 1, parts.length));
 
                 Serializer serializer = serializers.get(entityCode);
                 if (serializer != null) {
@@ -155,6 +155,7 @@ public class Database {
             System.out.println("Invalid entity: " + e.getMessage());
         }
     }
+
 
 
 
