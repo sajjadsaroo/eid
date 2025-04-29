@@ -133,7 +133,7 @@ public class Database {
                 if (parts.length < 2) continue;
 
                 int entityCode = Integer.parseInt(parts[0]);
-                String serializedData = String.join(",", Arrays.copyOfRange(parts, 1, parts.length));
+                String serializedData = String.join(",", Arrays.copyOfRange(parts, 0, parts.length));
 
                 Serializer serializer = serializers.get(entityCode);
                 if (serializer != null) {
